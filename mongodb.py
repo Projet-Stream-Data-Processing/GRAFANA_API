@@ -39,11 +39,33 @@ def stations(recherche:str):
                 d[convert_to_time_ms(e['timestamp'])] += int(e[recherche_])
         for k,v in d.items():
             r.append([v,k])
-        return r
         
+        return [{"target":recherche,"datapoints":r}]
         
-    
+    """
+    result = c_Station.aggregate([
+        {
+            '$lookup': {
+                'from': 'StationName', 
+                'localField': 'id', 
+                'foreignField': 'id', 
+                'as': 'joinedResult'
+            }
+        }
+    ])
+    identifiant = "name"
+    """
+    identifiant = "id"
+    d = {}
     for e in c_Station.find({},{"_id":0}):
-        r.append([e[recherche],convert_to_time_ms(e['timestamp'])])
-    
+        if not e[identifiant] in d:
+            d[e[identifiant]] = [[e[recherche],convert_to_time_ms(e['timestamp'])]]
+        else:
+            d[e[identifiant]].append([e[recherche],convert_to_time_ms(e['timestamp'])])
+
+    for k,v in d.items():
+        r.append({
+            "target": k,
+            "datapoints": v
+        })    
     return r

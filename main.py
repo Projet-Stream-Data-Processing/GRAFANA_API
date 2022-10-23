@@ -18,12 +18,7 @@ def search():
 @app.route("/query", methods=['POST'])
 def query():
     req = request.get_json()
-    data = [
-        {
-            "target": req['targets'][0]['target'],
-            "datapoints": stations(req['targets'][0]['target']) 
-        }
-    ]
+    data = stations(req['targets'][0]['target'])
     return jsonify(data)
 
 @app.route("/annotations")
